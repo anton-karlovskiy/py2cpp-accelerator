@@ -26,6 +26,8 @@ grok_client = OpenAI(
     base_url="https://api.x.ai/v1",
 )
 
+SAMPLES_DIR = "samples"
+
 MODELS = {
     "openai":    (openai_client,    "gpt-5"),
     "anthropic": (anthropic_client, "claude-sonnet-4-6"),
@@ -172,9 +174,11 @@ def main():
         run_python(python_code)
         print()
 
+    os.makedirs(SAMPLES_DIR, exist_ok=True)
+
     for name in targets:
         client, model = MODELS[name]
-        out_stem = f"main_{name}"
+        out_stem = f"{SAMPLES_DIR}/main_{name}"
         compile_cmd, run_cmd = _default_commands(out_stem)
 
         print(f"=== [{name.upper()}] {model} ===")

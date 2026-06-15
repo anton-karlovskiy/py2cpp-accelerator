@@ -55,10 +55,10 @@ uv run python main.py --model grok
 uv run python main.py --model all --python-baseline
 
 # Convert your own Python file
-uv run python main.py --input examples/my_script.py --model openai
+uv run python main.py --input samples/my_script.py --model openai
 
 # Generate C++ only — skip compile and run
-uv run python main.py --input examples/my_script.py --no-compile
+uv run python main.py --input samples/my_script.py --no-compile
 ```
 
 ## Models
@@ -104,7 +104,7 @@ uv run python system_info.py
 py2cpp-accelerator/
 ├── main.py                        # CLI entrypoint
 ├── system_info.py                 # detects OS, CPU, and available compilers
-├── examples/
+├── samples/
 │   └── pi_approximation.py        # built-in π benchmark (Leibniz formula, 200M iterations)
 ├── pyproject.toml
 ├── .env.example
