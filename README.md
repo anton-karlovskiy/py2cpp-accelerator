@@ -1,4 +1,4 @@
-# py2cpp-accelerator
+# Py2Cpp Accelerator
 
 Convert Python code to optimized C++ using frontier LLMs, achieving up to 60,000x performance gains.
 
