@@ -239,3 +239,8 @@ def retrieve_system_info():
         "cpu": _cpu_block(),
         "toolchain": _toolchain_block(),
     }
+
+
+if __name__ == "__main__":
+    import json
+    print(json.dumps(retrieve_system_info(), indent=2))
