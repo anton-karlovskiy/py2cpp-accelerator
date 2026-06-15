@@ -35,11 +35,16 @@ MODELS = {
 
 # -- Compile/run commands: auto-detect sensible defaults per OS --
 def _default_commands(out_name: str = "main_out"):
-    sys = platform.system()
-    if sys == "Windows":
+    sysname = platform.system()
+    if sysname == "Windows":
         if shutil.which("cl"):
             return (
                 ["cl", "/O2", "/std:c++17", "/EHsc", f"/Fe:{out_name}.exe", "main.cpp"],
+                [f"{out_name}.exe"],
+            )
+        elif shutil.which("clang++"):
+            return (
+                ["clang++", "-std=c++17", "-Ofast", "-march=native", "-DNDEBUG", "main.cpp", "-o", f"{out_name}.exe"],
                 [f"{out_name}.exe"],
             )
         elif shutil.which("g++"):
@@ -115,7 +120,7 @@ def generate_cpp(client: OpenAI, model: str, python: str, system_info: dict, com
         kwargs["reasoning_effort"] = "high"
     response = client.chat.completions.create(**kwargs)
     cpp = response.choices[0].message.content
-    return cpp.replace("```cpp", "").replace("```", "").strip()
+    return cpp.replace("```cpp", "").replace("```c++", "").replace("```c", "").replace("```", "").strip()
 
 
 def compile_and_run(compile_cmd: list, run_cmd: list) -> str:

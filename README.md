@@ -18,7 +18,7 @@ Convert Python code to optimized C++ using frontier LLMs, achieving up to 60,000
 ## Setup
 
 ```bash
-git clone https://github.com/your-username/py2cpp-accelerator.git
+git clone https://github.com/anton-karlovskiy/py2cpp-accelerator.git
 cd py2cpp-accelerator
 cp .env.example .env   # fill in your API keys
 uv sync
