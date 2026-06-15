@@ -55,10 +55,10 @@ uv run python main.py --model grok
 uv run python main.py --model all --python-baseline
 
 # Convert your own Python file
-uv run python main.py --input my_script.py --model openai
+uv run python main.py --input examples/my_script.py --model openai
 
 # Generate C++ only — skip compile and run
-uv run python main.py --input my_script.py --no-compile
+uv run python main.py --input examples/my_script.py --no-compile
 ```
 
 ## Models
