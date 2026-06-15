@@ -54,8 +54,8 @@ def _os_block() -> dict[str, Any]:
                 data = {}
                 for line in f:
                     if "=" in line:
-                        k, v = line.rstrip().split("=", 1)
-                        data[k] = v.strip('"')
+                        key, value = line.rstrip().split("=", 1)
+                        data[key] = value.strip('"')
                 distro["name"] = data.get("PRETTY_NAME") or data.get("NAME", "")
                 distro["version"] = data.get("VERSION_ID") or data.get("VERSION", "")
         except Exception:
@@ -66,8 +66,8 @@ def _os_block() -> dict[str, Any]:
     if sysname != "Windows":
         try:
             with open("/proc/version", "r") as f:
-                v = f.read().lower()
-                wsl = ("microsoft" in v) or ("wsl" in v)
+                proc_version = f.read().lower()
+                wsl = ("microsoft" in proc_version) or ("wsl" in proc_version)
         except Exception:
             wsl = False
 
@@ -102,22 +102,22 @@ def _os_block() -> dict[str, Any]:
 
 def _package_managers() -> list[str]:
     sysname = platform.system()
-    pms = []
+    managers = []
     if sysname == "Windows":
         for pm in ("winget", "choco", "scoop"):
             if _which(pm):
-                pms.append(pm)
+                managers.append(pm)
     elif sysname == "Darwin":
         if _run(["xcode-select", "-p"]):
-            pms.append("xcode-select (CLT)")
+            managers.append("xcode-select (CLT)")
         for pm in ("brew", "port"):
             if _which(pm):
-                pms.append(pm)
+                managers.append(pm)
     else:
         for pm in ("apt", "dnf", "yum", "pacman", "zypper", "apk", "emerge"):
             if _which(pm):
-                pms.append(pm)
-    return pms
+                managers.append(pm)
+    return managers
 
 
 # ------------------------- CPU (minimal) -------------------------
@@ -161,12 +161,12 @@ def _cpu_block() -> dict[str, Any]:
     if sysname == "Linux":
         flags = _run("grep -m1 'flags' /proc/cpuinfo | cut -d: -f2")
         if flags:
-            fset = set(flags.upper().split())
+            flag_set = set(flags.upper().split())
             for x in ("AVX512F", "AVX2", "AVX", "FMA", "SSE4_2", "NEON", "SVE"):
-                if x in fset:
+                if x in flag_set:
                     simd.append(x)
     elif sysname == "Darwin":
-        feats = (
+        features = (
             (
                 _run(["sysctl", "-n", "machdep.cpu.features"])
                 + " "
@@ -176,7 +176,7 @@ def _cpu_block() -> dict[str, Any]:
             .split()
         )
         for x in ("AVX512F", "AVX2", "AVX", "FMA", "SSE4_2", "NEON", "SVE"):
-            if x in feats:
+            if x in features:
                 simd.append(x)
     # On Windows, skip flags — brand typically suffices for MSVC /arch choice.
 
@@ -193,10 +193,10 @@ def _cpu_block() -> dict[str, Any]:
 
 def _toolchain_block() -> dict[str, Any]:
     def ver_line(exe: str, args: tuple[str, ...] = ("--version",)) -> str:
-        p = _which(exe)
-        if not p:
+        exe_path = _which(exe)
+        if not exe_path:
             return ""
-        out = _run([p, *args])
+        out = _run([exe_path, *args])
         return _first_line(out)
 
     gcc = ver_line("gcc")

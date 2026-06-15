@@ -77,17 +77,17 @@ The C++ response needs to produce an identical output in the fastest possible ti
 PI_EXAMPLE = """\
 import time
 
-def calculate(iterations, param1, param2):
+def calculate_pi(iterations, multiplier, offset):
     result = 1.0
     for i in range(1, iterations + 1):
-        j = i * param1 - param2
-        result -= (1 / j)
-        j = i * param1 + param2
-        result += (1 / j)
+        denominator = i * multiplier - offset
+        result -= (1 / denominator)
+        denominator = i * multiplier + offset
+        result += (1 / denominator)
     return result
 
 start_time = time.time()
-result = calculate(200_000_000, 4, 1) * 4
+result = calculate_pi(200_000_000, 4, 1) * 4
 end_time = time.time()
 
 print(f"Result: {result:.12f}")
@@ -112,7 +112,7 @@ Python code to port:
 
 
 def generate_cpp(client: OpenAI, model: str, python: str, system_info: dict[str, Any], compile_command: list[str]) -> str:
-    kwargs = {
+    request_params = {
         "model": model,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -120,8 +120,8 @@ def generate_cpp(client: OpenAI, model: str, python: str, system_info: dict[str,
         ],
     }
     if "gpt" in model:
-        kwargs["reasoning_effort"] = "high"
-    response = client.chat.completions.create(**kwargs)
+        request_params["reasoning_effort"] = "high"
+    response = client.chat.completions.create(**request_params)
     cpp = response.choices[0].message.content or ""
     return cpp.replace("```cpp", "").replace("```c++", "").replace("```c", "").replace("```", "").strip()
 
@@ -177,26 +177,25 @@ def main() -> None:
 
     os.makedirs(SAMPLES_DIR, exist_ok=True)
 
-    for name in targets:
-        client, model = MODELS[name]
-        out_stem = f"{SAMPLES_DIR}/main_{name}"
-        compile_cmd, run_cmd = _default_commands(out_stem)
+    for provider in targets:
+        client, model = MODELS[provider]
+        output_stem = f"{SAMPLES_DIR}/main_{provider}"
+        compile_cmd, run_cmd = _default_commands(output_stem)
 
-        print(f"=== [{name.upper()}] {model} ===")
+        print(f"=== [{provider.upper()}] {model} ===")
         print(f"Generating C++...", end=" ", flush=True)
 
         cpp = generate_cpp(client, model, python_code, system_info, compile_cmd)
-        cpp_file = f"{out_stem}.cpp"
+        cpp_file = f"{output_stem}.cpp"
         with open(cpp_file, "w", encoding="utf-8") as f:
             f.write(cpp)
         print(f"written to {cpp_file}")
 
         if not args.no_compile:
-            # Patch compile command to use the named output file
             try:
                 print("Compiling and running...")
-                actual_compile = [a.replace("main.cpp", cpp_file) for a in compile_cmd]
-                output = compile_and_run(actual_compile, run_cmd)
+                compile_cmd_patched = [a.replace("main.cpp", cpp_file) for a in compile_cmd]
+                output = compile_and_run(compile_cmd_patched, run_cmd)
                 print(output)
             except subprocess.CalledProcessError as e:
                 print(f"Error: {e.stderr or e.stdout}")
