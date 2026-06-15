@@ -13,7 +13,7 @@ Convert Python code to optimized C++ using frontier LLMs, achieving up to 60,000
 
 - Python 3.11+
 - [uv](https://docs.astral.sh/uv/)
-- A C++ compiler: `clang++`, `g++`, or MSVC `cl` (auto-detected — see [Compiler setup](#compiler-setup) below)
+- A C++ compiler: `clang++`, `g++`, or MSVC `cl` (auto-detected, see [Compiler setup](#compiler-setup) below)
 
 ## Setup
 
@@ -84,7 +84,7 @@ With vectorization and `-Ofast`, the best models have demonstrated speedups exce
 
 ## Compiler setup
 
-The compiler is auto-detected at runtime — no manual configuration needed. You just need one of the following on your `PATH`:
+The compiler is auto-detected at runtime. You just need one of the following on your `PATH`:
 
 | Compiler | Windows install | macOS/Linux install |
 |----------|----------------|---------------------|
