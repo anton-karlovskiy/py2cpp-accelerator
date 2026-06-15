@@ -16,4 +16,16 @@ build-backend = "hatchling.build"
 packages = ["."]
 
 [dependency-groups]
-dev = []
+dev = [
+    "mypy>=1.10",
+]
+
+[tool.mypy]
+python_version = "3.11"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+warn_return_any = true
+no_implicit_optional = true
+warn_unused_ignores = true
+ignore_missing_imports = true

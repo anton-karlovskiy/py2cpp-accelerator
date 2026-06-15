@@ -2,11 +2,12 @@ import os
 import platform
 import shutil
 import subprocess
+from typing import Any
 
 # ------------------------- helpers -------------------------
 
 
-def _run(cmd, timeout=3):
+def _run(cmd: str | list[str], timeout: int = 3) -> str:
     """Run a command safely. Returns stdout text or ''.
     Accepts either a string (shell) or list (no shell)."""
     try:
@@ -38,7 +39,7 @@ def _bool_from_output(s: str) -> bool:
 # ------------------------- OS & env -------------------------
 
 
-def _os_block():
+def _os_block() -> dict[str, Any]:
     sysname = platform.system()  # 'Windows', 'Darwin', 'Linux'
     machine = platform.machine() or ""
     release = platform.release() or ""
@@ -99,7 +100,7 @@ def _os_block():
 # ------------------------- package managers -------------------------
 
 
-def _package_managers():
+def _package_managers() -> list[str]:
     sysname = platform.system()
     pms = []
     if sysname == "Windows":
@@ -122,7 +123,7 @@ def _package_managers():
 # ------------------------- CPU (minimal) -------------------------
 
 
-def _cpu_block():
+def _cpu_block() -> dict[str, Any]:
     sysname = platform.system()
     brand = ""
     # A simple brand/model read per OS; ignore failures
@@ -190,8 +191,8 @@ def _cpu_block():
 # ------------------------- toolchain presence -------------------------
 
 
-def _toolchain_block():
-    def ver_line(exe, args=("--version",)):
+def _toolchain_block() -> dict[str, Any]:
+    def ver_line(exe: str, args: tuple[str, ...] = ("--version",)) -> str:
         p = _which(exe)
         if not p:
             return ""
@@ -225,7 +226,7 @@ def _toolchain_block():
 # ------------------------- public API -------------------------
 
 
-def retrieve_system_info():
+def retrieve_system_info() -> dict[str, Any]:
     """
     Returns a compact dict with enough info for an LLM to:
       - Pick an install path (winget/choco/scoop, Homebrew/Xcode CLT, apt/dnf/...),

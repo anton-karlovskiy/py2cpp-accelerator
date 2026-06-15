@@ -3,6 +3,7 @@ import shutil
 import platform
 import argparse
 import subprocess
+from typing import Any
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -36,7 +37,7 @@ MODELS = {
 }
 
 # -- Compile/run commands: auto-detect sensible defaults per OS --
-def _default_commands(out_name: str = "main_out"):
+def _default_commands(out_name: str = "main_out") -> tuple[list[str], list[str]]:
     sysname = platform.system()
     if sysname == "Windows":
         if shutil.which("cl"):
@@ -94,7 +95,7 @@ print(f"Execution Time: {(end_time - start_time):.6f} seconds")
 """
 
 
-def user_prompt_for(python: str, system_info: dict, compile_command: list) -> str:
+def user_prompt_for(python: str, system_info: dict[str, Any], compile_command: list[str]) -> str:
     return f"""
 Port this Python code to C++ with the fastest possible implementation that produces identical output in the least time.
 The system information is:
@@ -110,7 +111,7 @@ Python code to port:
 """
 
 
-def generate_cpp(client: OpenAI, model: str, python: str, system_info: dict, compile_command: list) -> str:
+def generate_cpp(client: OpenAI, model: str, python: str, system_info: dict[str, Any], compile_command: list[str]) -> str:
     kwargs = {
         "model": model,
         "messages": [
@@ -121,11 +122,11 @@ def generate_cpp(client: OpenAI, model: str, python: str, system_info: dict, com
     if "gpt" in model:
         kwargs["reasoning_effort"] = "high"
     response = client.chat.completions.create(**kwargs)
-    cpp = response.choices[0].message.content
+    cpp = response.choices[0].message.content or ""
     return cpp.replace("```cpp", "").replace("```c++", "").replace("```c", "").replace("```", "").strip()
 
 
-def compile_and_run(compile_cmd: list, run_cmd: list) -> str:
+def compile_and_run(compile_cmd: list[str], run_cmd: list[str]) -> str:
     subprocess.run(compile_cmd, check=True, text=True, capture_output=True)
     result = subprocess.run(run_cmd, check=True, text=True, capture_output=True)
     return result.stdout.strip()
@@ -135,7 +136,7 @@ def run_python(code: str) -> None:
     exec(compile(code, "<string>", "exec"), {"__builtins__": __builtins__})
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Convert Python to optimized C++ using LLMs for massive performance gains."
     )
