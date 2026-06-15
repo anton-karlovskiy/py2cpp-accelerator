@@ -86,8 +86,10 @@ With vectorization and `-Ofast`, the best models have demonstrated speedups exce
 
 ```
 py2cpp-accelerator/
-├── main.py          # CLI entrypoint
-├── system_info.py   # detects OS, CPU, and available compilers
+├── main.py                        # CLI entrypoint
+├── system_info.py                 # detects OS, CPU, and available compilers
+├── examples/
+│   └── pi_approximation.py        # built-in π benchmark (Leibniz formula, 200M iterations)
 ├── pyproject.toml
 ├── .env.example
 └── .gitignore
