@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+dist/
+
+# Generated C++ files and compiled output
+*.cpp
+*.exe
+main_*
